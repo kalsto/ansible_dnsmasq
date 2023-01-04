@@ -1,3 +1,4 @@
+{{ ansible_managed | comment }}
 port={{ dnsmasq_listen_port }}
 {% if not dnsmasq_read_etc_hosts %}
 no-hosts
@@ -62,8 +63,12 @@ enable-tftp
 tftp-root={{ dnsmasq_tftpboot_dir }}
 {% endif %}
 {% if dnsmasq_enable_dhcp %}
+{% if dhcp_leasefile is defined %}
+dhcp-leasefile={{ dhcp_leasefile }}
+{% endif %}
 dhcp-client-update
-dhcp-boot={{ dnsmasq_dhcp_boot }}
+{% if dnsmasq_dhcp_boot %}dhcp-boot={{ dnsmasq_dhcp_boot }}
+{% endif %}
 {%   if dnsmasq_dhcp_host_reservations is defined and dnsmasq_dhcp_host_reservations != [] %}
 {%     for item in dnsmasq_dhcp_host_reservations %}
 dhcp-host={{ item['mac_address']|join(',') }}{% if item['name'] is defined %},{{ item['name'] }}{% endif %}{% if item['address'] is defined %},{{ item['address'] }}{% endif %}{% if item['lease_time'] is defined %},{{ item['lease_time'] }}{% endif %}
